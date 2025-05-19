@@ -25,7 +25,6 @@ plt.rcParams.update({
 
 # -------------------- Targeted Analysis Metrics --------------------
 df_spatial = pd.read_csv("spatial_targeted.csv", on_bad_lines='skip', index_col=False)
-# Map GridIndex to descriptive spatial distribution names
 spatial_map = {
     0: "Uniform",
     1: "Random",
@@ -41,7 +40,7 @@ last_time_step = df_spatial["TimeStep"].max()
 df_spatial = df_spatial[df_spatial["TimeStep"] == last_time_step].copy()
 df_spatial = df_spatial.dropna(subset=["FractalDimension", "Eccentricity"])
 
-# Define key metrics and display names 
+# Define spatial metrics and names 
 metrics = ["TumorCellCount", "FractalDimension", "Lacunarity", "Eccentricity"]
 display_names = {
     "TumorCellCount": "Tumor Cell Count",
@@ -60,10 +59,9 @@ for metric in metrics:
         distr = row["GridIndex"]
         mean_val = row["mean"]
         std_val = row["std"]
-        # Print using mapped spatial distribution names if available.
         print(f"  {spatial_map.get(distr, distr)}: {mean_val:.3f} ± {std_val:.3f}")
 
-# -------------------- Statistical Analysis (Fig S?)--------------------
+# -------------------- Statistical Analysis (Fig S7)--------------------
 results = []
 dunn_results_dict = {}  # to store Dunn's test DataFrames for later plotting
 
@@ -104,7 +102,7 @@ for metric in metrics:
             except ZeroDivisionError:
                 dunn_df = pd.DataFrame({"Error": ["Insufficient samples for Dunn's test"]})
             posthoc = dunn_df
-            dunn_results_dict[metric] = dunn_df  # Store for plotting later
+            dunn_results_dict[metric] = dunn_df  
         else:
             overall_p = np.nan
             posthoc = "Insufficient samples"
@@ -147,7 +145,7 @@ if len(dunn_keys) > 0:
     plt.show()
 else:
     print("No Dunn's test results to plot.")
-  
+
 # -------------------- Figure 7B: Spatial Targeted Data Boxplots--------------------
 df_box = pd.read_csv("spatial_targeted.csv", on_bad_lines='skip', index_col=False)
 final_time = df_box["TimeStep"].max()
@@ -156,11 +154,11 @@ df_box = df_box[df_box["TimeStep"] == final_time].copy()
 # Force "GridIndex" to be integers then convert to strings.
 df_box["GridIndex"] = df_box["GridIndex"].astype(int).astype(str)
 
-# Create a light bluish palette with 6 colors and assign string keys.
+# Create a blue palette with 6 colors and assign string keys.
 palette = sns.light_palette("#4C72B0", n_colors=6, reverse=False)
 palette_dict = {str(i): to_hex(color) for i, color in enumerate(palette)}
 
-# Distribution labels that will be displayed on the x-axis.
+# Distribution labels will be displayed on the x-axis.
 distribution_labels = ["Uniform", "Random", "Clumped", "Radial", "Inverse Radial", "Gradient"]
 
 # Define metrics and their display names.
@@ -234,7 +232,7 @@ df_final = df_final[df_final["TumorCellCount"] >= 3000].copy()
 # Define regimes via tertile split
 df_ref = df_final[df_final["GridIndex"] == 1].copy()
 
-# Group by ParamSetIndex and compute the average TumorCellCount for the reference condition.
+# Group by ParamSetIndex and compute average TumorCellCount for the reference condition.
 df_ranked = df_ref.groupby("ParamSetIndex")["TumorCellCount"].mean().reset_index()
 df_ranked = df_ranked.sort_values("TumorCellCount").reset_index(drop=True)
 
