@@ -5,7 +5,7 @@ import seaborn as sns
 import scipy.stats as stats  
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
-import scikit_posthocs as sp
+import scikit_posthocs as sp 
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 # ---------------- Global Style Settings ---------------
@@ -21,14 +21,15 @@ plt.rcParams.update({
 
 # ---------------- Density Targeted Statistical Analysis ----------------
 df = pd.read_csv("density_targeted.csv")
+
 # Map GridIndex values to astrocyte density percentages
 astrocyte_density_map = {0: 0, 1: 10, 2: 20, 3: 30, 4: 40, 5: 50}
 df["AstrocyteDensity"] = df["GridIndex"].map(astrocyte_density_map)
+
 # Keep only the final time step and drop rows missing key morphology metrics
 last_time = df["TimeStep"].max()
 df = df[df["TimeStep"] == last_time].copy().dropna(subset=["FractalDimension", "Eccentricity"])
 
-# Statistical Analysis for Metrics 
 metrics = ["TumorCellCount", "FractalDimension", "Lacunarity", "Eccentricity"]
 results = []
 
@@ -131,7 +132,6 @@ desired_columns = [
 ]
 df_psa = df_psa.iloc[:, :len(desired_columns)]
 df_psa.columns = desired_columns
-# Rename columns 
 df_psa = df_psa.rename(columns={"S2": "switchSensitivity", "S4": "divisionSensitivity"})
 
 # Keep only the final time step
@@ -145,10 +145,12 @@ df_ranked = df_10.groupby("ParamSetIndex")["TumorCellCount"].mean().reset_index(
 df_ranked = df_ranked.sort_values("TumorCellCount").reset_index(drop=True)
 n = len(df_ranked)
 third = n // 3
+
 # Label the bottom tertile as "Inhibitory", middle as "Neutral", and top as "Promoting"
 df_ranked["Regime"] = (["Inhibitory"] * third +
                        ["Neutral"] * third +
                        ["Promoting"] * (n - 2 * third))
+
 # Keep only "Inhibitory" and "Promoting" regimes
 selected_params = df_ranked[df_ranked["Regime"].isin(["Inhibitory", "Promoting"])]["ParamSetIndex"]
 
@@ -185,11 +187,10 @@ xpos = {
     ("50%", "Promoting"):  1 + 0.15
 }
 
-# Create subplots for each metric 
 fig, axes = plt.subplots(1, 4, figsize=(20, 5), sharey=False)
 
 for ax, metric in zip(axes, metrics):
-    # Loop through each combination of GridLabel and Regime and plot a boxplot at its x position
+    # Loop through each combination of GridLabel and Regime 
     for (gridlbl, regime), x_pos in xpos.items():
         data = df_plot[(df_plot["GridLabel"] == gridlbl) & (df_plot["Regime"] == regime)][metric].dropna()
         # Plot a boxplot for the current dataset
@@ -200,7 +201,7 @@ for ax, metric in zip(axes, metrics):
             patch_artist=True,
             showfliers=True
         )
-        # Customize the box appearance using colors for each regime
+        # Customize box appearance for each regime
         for box in bplot["boxes"]:
             box.set_facecolor(color_dict[regime])
             box.set_edgecolor("black")
