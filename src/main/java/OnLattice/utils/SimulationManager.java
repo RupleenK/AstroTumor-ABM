@@ -68,6 +68,7 @@ public class SimulationManager {
     // -------------------------------------------------------------------
     // Main method for launching the simulation.
     // -------------------------------------------------------------------
+    
     public static void main(String[] args) {
 
         // Determine if the environment supports graphics.
