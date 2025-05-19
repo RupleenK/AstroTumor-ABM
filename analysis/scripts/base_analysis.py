@@ -47,7 +47,7 @@ percent_increase = ((mean_reprog - mean_control) / mean_control) * 100
 u_stat, p_val = mannwhitneyu(control["TumorCellCount"], reprog["TumorCellCount"], alternative='two-sided')
 d_value = cohens_d(control["TumorCellCount"], reprog["TumorCellCount"])
 
-# Print the analysis results
+# Print analysis results
 print("===== Tumor Cell Count Analysis =====")
 print(f"Control: {mean_control:.2f} ± {std_control:.2f}")
 print(f"Reprog: {mean_reprog:.2f} ± {std_reprog:.2f}")
@@ -166,9 +166,7 @@ df_psa = df_psa.rename(columns={"S2": "switchSensitivity", "S4": "divisionSensit
 last_time_psa = df_psa["TimeStep"].max()
 df_psa = df_psa[df_psa["TimeStep"] == last_time_psa].copy()
 
-# Define an aggregation dictionary:
-# - For output metrics, compute the mean
-# - For input parameters, take the first value encountered
+# For output metrics, compute the mean - for input parameters, take the first value encountered
 agg_dict = {
     "TumorCellCount": "mean",
     "FractalDimension": "mean",
@@ -186,25 +184,25 @@ agg_dict = {
 for col in agg_dict.keys():
     df_psa[col] = pd.to_numeric(df_psa[col], errors='coerce')
 
-# Group the data by "ParamSetIndex" and aggregate
+# Group data by "ParamSetIndex" and aggregate
 df_agg = df_psa.groupby("ParamSetIndex", as_index=False).agg(agg_dict)
 
-# Inputs: parameters used for sensitivity analysis
+# Inputs parameters for sensitivity analysis
 input_cols = ["effectAntiMet", "effectProMet", "conversionThreshold",
               "switchSensitivity", "divisionSensitivity", "effectPerTumorCell"]
 
-# Outputs: metrics being evaluated
+# Outputs metrics 
 output_metrics = ["TumorCellCount", "FractalDimension", "Lacunarity", "Eccentricity"]
 
-# Extract the input and output dataframes from the aggregated data
+# Extract the input and output dataframes 
 X = df_agg[input_cols].copy()
 Y = df_agg[output_metrics].copy()
 
-# Rank the inputs and outputs 
+# Rank inputs and outputs 
 X_ranked = X.rank()
 Y_ranked = Y.rank()
 
-# Create a dictionary to store PRCC results for each output metric
+# Create dictionary to store PRCC results for each output metric
 prcc_results = {metric: {} for metric in output_metrics}
 
 # Loop over each output metric and then each input parameter
@@ -218,18 +216,17 @@ for metric in output_metrics:
         # Copy the ranked input dataframe and add the current output metric column
         df_temp = X_ranked.copy()
         df_temp[metric] = Y_ranked[metric]
-        # Compute partial correlation using Spearman's method via pingouin
+        # Compute partial correlation 
         result = pg.partial_corr(data=df_temp, x=col, y=metric, covar=covariates, method='spearman')
-        # Save the computed correlation coefficient for this parameter/metric pair
+        # Save the computed correlation coefficient 
         prcc_results[metric][col] = result['r'].values[0]
 
-# Convert the PRCC results into a dictionary of dataframes (one per metric)
+# Convert the PRCC results into a dictionary of dataframes 
 prcc_dfs = {
     metric: pd.DataFrame(list(res.items()), columns=["Parameter", "PRCC"])
     for metric, res in prcc_results.items()
 }
 
-# Define display names for the output metrics for clarity in printing and plotting
 display_names = {
     "TumorCellCount": "Tumor Cell Count",
     "FractalDimension": "Fractal Dimension",
@@ -237,7 +234,6 @@ display_names = {
     "Eccentricity": "Eccentricity"
 }
 
-# This custom ordering will be used when printing and plotting the results
 fixed_order = [
     "effectPerTumorCell",
     "divisionSensitivity",
@@ -247,7 +243,6 @@ fixed_order = [
     "effectAntiMet"
 ]
 
-# Print PRCC values 
 print("\n=== Partial Rank Correlation Coefficients (PRCC) ===")
 for metric, df_metric in prcc_dfs.items():
     print(f"\n{display_names[metric]}:")
@@ -256,14 +251,11 @@ for metric, df_metric in prcc_dfs.items():
     for _, row in df_sorted.iterrows():
         print(f"  {row['Parameter']}: {row['PRCC']:.3f}")
 
-# Create a figure with one subplot for each output metric
 fig, axes = plt.subplots(1, len(output_metrics), figsize=(20, 5), sharex=True)
 
 for i, metric in enumerate(output_metrics):
     if metric in prcc_dfs:
-        # Reorder the results dataframe according to the fixed order
         df_plot = prcc_dfs[metric].set_index("Parameter").reindex(fixed_order).reset_index()
-        # Generate a horizontal bar plot
         axes[i].barh(df_plot["Parameter"], df_plot["PRCC"], color="skyblue", edgecolor="black")
         axes[i].set_title(display_names[metric], fontsize=14)
         axes[i].set_xlabel("PRCC", fontsize=12)
