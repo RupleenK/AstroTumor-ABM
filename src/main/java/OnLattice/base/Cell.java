@@ -105,6 +105,7 @@ public class Cell extends AgentSQ2Dunstackable<ExampleGrid> {
     // and the local tumor influence (calculated from nearby tumor cells) exceeds a conversion threshold, the cell may
     // switch its state to PRO_METASTATIC.
     public void AstrocyteSwitching(double conversionThreshold, double effectPerTumorCell, double S2) {
+        
         // Exit early if switching is disabled or if the cell is not an anti-metastatic astrocyte.
         if (!G.enableAstrocyteSwitch ||
                 this.type.getCellTypeEnum() != ASTROCYTE ||
