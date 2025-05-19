@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.*;
 
 /**
- * Provides various methods for initializing spatial distributions of astrocytes in a grid.
+ * For initializing spatial distributions of astrocytes in a grid.
  */
 public class SpatialDistributions {
 
@@ -17,7 +17,7 @@ public class SpatialDistributions {
         return (x == grid.xDim / 2 && y == grid.yDim / 2);
     }
 
-    // Initializes the grid with a uniform (approximately square) distribution of astrocytes.
+    // Initializes the grid with a uniform distribution of astrocytes.
     public static void initUniformAstrocytes(ExampleGrid grid, int numAstrocytes) {
         int numRows = (int) Math.sqrt(numAstrocytes);
         int numCols = (int) Math.ceil((double) numAstrocytes / numRows);
@@ -109,7 +109,7 @@ public class SpatialDistributions {
         // Iterate over every grid cell.
         for (int x = 0; x < grid.xDim; x++) {
             for (int y = 0; y < grid.yDim; y++) {
-                if (isCenterCell(grid, x, y)) continue; // Always skip center cell
+                if (isCenterCell(grid, x, y)) continue; // skip center cell
                 if (!grid.IsEmpty(x, y)) continue;
                 double d = Math.hypot(x - centerX, y - centerY);
                 double weight = Math.pow(d / maxDist, exponent);
@@ -123,7 +123,6 @@ public class SpatialDistributions {
             numAstrocytes = siteIndices.size();
         }
 
-        // Use the helper method for weighted sampling without replacement.
         ArrayList<Integer> chosenSites = WeightedSampleWithoutReplacement(siteIndices, siteWeights, numAstrocytes, grid.rng);
         for (int iSq : chosenSites) {
             int xx = iSq % grid.xDim;
@@ -153,7 +152,6 @@ public class SpatialDistributions {
                 int blockStartY = j * blockHeight;
                 int centerX = blockStartX + blockWidth / 2;
                 int centerY = blockStartY + blockHeight / 2;
-                // If the block center is the grid center, adjust to skip it.
                 if (isCenterCell(grid, centerX, centerY)) {
                     centerX++;
                 }
@@ -221,7 +219,7 @@ public class SpatialDistributions {
         System.out.println("✅ Radial: Placed " + numAstrocytes + " astrocytes (exponent=" + exponent + ").");
     }
 
-    // Performs weighted sampling without replacement.Each candidate site is assigned a weight based on distance from the center.
+    // Performs weighted sampling without replacement. Each candidate site is assigned a weight based on distance from the center.
     // The method then randomly selects a specified number of these cells according to their weights,
     // ensuring that each chosen cell is unique (no replacement). This allows modeling non-uniform distributions—where
     // some areas are more likely to be chosen than others—while ensuring that you don’t place multiple astrocytes in the same grid site.
