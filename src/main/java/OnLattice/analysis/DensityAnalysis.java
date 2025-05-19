@@ -23,7 +23,7 @@ public class DensityAnalysis {
     // Randomly initializes a specified number of neutral agents in the grid.
     public static void initRandomNeutralAgents(ExampleGrid grid, int neutralsum) {
         Random rand = new Random(12345);
-        HashSet<String> placedCells = new HashSet<>(); // O(1) lookup time
+        HashSet<String> placedCells = new HashSet<>(); 
         List<int[]> positions = new ArrayList<>();
 
         int centerX = grid.xDim / 2;
