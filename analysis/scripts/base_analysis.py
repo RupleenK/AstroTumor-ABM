@@ -17,12 +17,6 @@ plt.rcParams.update({
     "legend.fontsize": 18,
 })
 
-# ---------------- Cohen's d Function ----------------
-def cohens_d(x, y):
-    nx, ny = len(x), len(y)
-    dof = nx + ny - 2
-    return (np.mean(x) - np.mean(y)) / np.sqrt(((nx - 1)*np.var(x, ddof=1) + (ny - 1)*np.var(y, ddof=1)) / dof)
-
 # ---------------- Data Loading and Preprocessing ----------------
 df_base = pd.read_csv("base_targeted.csv")
 last_time = df_base["TimeStep"].max()
@@ -53,7 +47,6 @@ print(f"Control: {mean_control:.2f} ± {std_control:.2f}")
 print(f"Reprog: {mean_reprog:.2f} ± {std_reprog:.2f}")
 print(f"Percent Increase: {percent_increase:.2f}%")
 print(f"Mann-Whitney U: {u_stat}, p-value: {p_val:.4g}")
-print(f"Cohen's d: {d_value:.3f}")
 print("\n")
 
 # ---------------- Morphology Metrics Analysis ----------------
