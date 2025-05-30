@@ -29,8 +29,8 @@ spatial_map = {
     0: "Uniform",
     1: "Random",
     2: "Clumped",
-    3: "Radial",
-    4: "Inverse Radial",
+    3: "Inverse Radial",
+    4: "Radial",
     5: "Gradient"
 }
 df_spatial["SpatialDistribution"] = df_spatial["GridIndex"].map(spatial_map)
@@ -129,9 +129,15 @@ if len(dunn_keys) > 0:
 
     for idx, metric in enumerate(dunn_keys):
         dunn_df = dunn_results_dict[metric].astype(float)
+        desired_order = ["Uniform", "Random", "Clumped", "Radial", "Inverse Radial", "Gradient"]
+        dunn_df = dunn_df.loc[desired_order, desired_order]
         annot = dunn_df.applymap(lambda p: f"{p:.3f}*" if p < alpha else f"{p:.3f}")
         ax = axes_dunn[idx]
-        sns.heatmap(dunn_df, annot=annot, fmt='', cmap="viridis", vmin=0, vmax=1, ax=ax)
+        sns.heatmap(
+        dunn_df.loc[desired_order, desired_order], 
+        annot=annot.loc[desired_order, desired_order], 
+        fmt='', cmap="viridis", vmin=0, vmax=1, ax=ax
+        )
         ax.set_title(f"Dunn's p-values for {display_names[metric]}")
         ax.set_xlabel("Spatial Distribution")
         ax.set_ylabel("Spatial Distribution")
@@ -179,7 +185,7 @@ for ax, metric in zip(axes, metrics):
         y=metric,
         data=df_box,
         palette=palette_dict,          
-        order=["0", "1", "2", "3", "4", "5"], 
+        order=["0", "1", "2", "4", "3", "5"],
         width=0.5,
         showfliers=False,
         ax=ax
@@ -191,7 +197,7 @@ for ax, metric in zip(axes, metrics):
         color="black",
         size=3,
         jitter=True,
-        order=["0", "1", "2", "3", "4", "5"],
+        order=["0", "1", "2", "4", "3", "5"],
         ax=ax
     )
     ax.set_title(display_names[metric], fontsize=20)
@@ -252,7 +258,7 @@ df_ranked = df_ranked[df_ranked["Regime"].isin(["Inhibitory", "Promoting"])]
 df_final = df_final.merge(df_ranked[["ParamSetIndex", "Regime"]], on="ParamSetIndex", how="inner")
 
 # Create heatmap matrices for each metric
-grid_indices = [0, 1, 2, 3, 4, 5]    
+grid_indices = [0, 1, 2, 4, 3, 5]    
 regimes = ["Inhibitory", "Promoting"]  
 
 # Define the metrics and their display names
@@ -278,7 +284,8 @@ for metric in metrics:
     heatmap_matrices[metric] = heat_data.astype(float)
 
 # Define x-axis labels for the heatmaps.
-distribution_labels = ["Uniform", "Random", "Clumped", "Radial", "Inverse Radial", "Gradient"]
+desired_order = ["Uniform", "Random", "Clumped", "Radial", "Inverse Radial", "Gradient"]
+heatmap_matrix = heatmap_matrix[desired_order]
 
 # Create subplots for each metric 
 fig, axes = plt.subplots(1, 4, figsize=(20, 4), sharey=True)
