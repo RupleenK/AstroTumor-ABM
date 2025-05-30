@@ -88,8 +88,8 @@ for metric in metrics:
 print("===== Morphology Metrics Analysis (No Switch vs. Switch) =====")
 for res in results:
     print(f"Metric: {res['Metric']}")
-    print(f"  No Switch: {res['No Switch - Mean ± Std']}")
-    print(f"  Switch:  {res['Switch - Mean ± Std']}")
+    print(f"  No Switch: {res['No Switch Mean ± Std']}")
+    print(f"  Switch:  {res['Switch Mean ± Std']}")
     print(f"  Mann-Whitney U: {res['U_stat']}, p-value: {res['p_value']:.3g}\n")
 
 # --------------- Figure 4B: Final Tumor Cell Count Over Time ---------------
