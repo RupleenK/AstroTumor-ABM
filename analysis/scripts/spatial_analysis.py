@@ -283,19 +283,25 @@ for metric in metrics:
             heat_data.loc[reg, g] = mean_val
     heatmap_matrices[metric] = heat_data.astype(float)
 
-# Define x-axis labels for the heatmaps.
-desired_order = ["Uniform", "Random", "Clumped", "Radial", "Inverse Radial", "Gradient"]
-heatmap_matrix = heatmap_matrix[desired_order]
+# Set up proper display labels and column ordering
+distribution_labels = ["Uniform", "Random", "Clumped", "Radial", "Inverse Radial", "Gradient"]
+column_order = [0, 1, 2, 4, 3, 5] 
+grid_index_to_label = dict(zip(column_order, distribution_labels))
 
-# Create subplots for each metric 
+# Create subplots for each metric
 fig, axes = plt.subplots(1, 4, figsize=(20, 4), sharey=True)
+
 for i, metric in enumerate(metrics):
     ax = axes[i]
-    heatmap_matrix = heatmap_matrices[metric].copy()
-    heatmap_matrix.columns = distribution_labels
+    
+    # Extract and reorder the heatmap matrix
+    heatmap_matrix = heatmap_matrices[metric][column_order]
+    heatmap_matrix.columns = [grid_index_to_label[i] for i in column_order]
+    
+    # Plot 
     sns.heatmap(
         heatmap_matrix,
-        annot=False,   
+        annot=False,
         fmt=".2f",
         cmap="Blues",
         cbar=True,
