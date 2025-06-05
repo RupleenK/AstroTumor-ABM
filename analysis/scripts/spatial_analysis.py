@@ -28,7 +28,7 @@ df_spatial = pd.read_csv("spatial_targeted.csv", on_bad_lines='skip', index_col=
 spatial_map = {
     0: "Uniform",
     1: "Random",
-    2: "clustered",
+    2: "Clustered",
     3: "Inverse Radial",
     4: "Radial",
     5: "Gradient"
@@ -129,7 +129,7 @@ if len(dunn_keys) > 0:
 
     for idx, metric in enumerate(dunn_keys):
         dunn_df = dunn_results_dict[metric].astype(float)
-        desired_order = ["Uniform", "Random", "clustered", "Radial", "Inverse Radial", "Gradient"]
+        desired_order = ["Uniform", "Random", "Clustered", "Radial", "Inverse Radial", "Gradient"]
         dunn_df = dunn_df.loc[desired_order, desired_order]
         annot = dunn_df.applymap(lambda p: f"{p:.3f}*" if p < alpha else f"{p:.3f}")
         ax = axes_dunn[idx]
@@ -165,7 +165,7 @@ palette = sns.light_palette("#4C72B0", n_colors=6, reverse=False)
 palette_dict = {str(i): to_hex(color) for i, color in enumerate(palette)}
 
 # Distribution labels will be displayed on the x-axis.
-distribution_labels = ["Uniform", "Random", "clustered", "Radial", "Inverse Radial", "Gradient"]
+distribution_labels = ["Uniform", "Random", "Clustered", "Radial", "Inverse Radial", "Gradient"]
 
 # Define metrics and their display names.
 metrics = ["TumorCellCount", "FractalDimension", "Lacunarity", "Eccentricity"]
@@ -284,7 +284,7 @@ for metric in metrics:
     heatmap_matrices[metric] = heat_data.astype(float)
 
 # Set up proper display labels and column ordering
-distribution_labels = ["Uniform", "Random", "clustered", "Radial", "Inverse Radial", "Gradient"]
+distribution_labels = ["Uniform", "Random", "Clustered", "Radial", "Inverse Radial", "Gradient"]
 column_order = [0, 1, 2, 4, 3, 5] 
 grid_index_to_label = dict(zip(column_order, distribution_labels))
 
